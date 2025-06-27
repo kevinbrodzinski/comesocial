@@ -1,73 +1,99 @@
-# Welcome to your Lovable project
+# Nightli Nova Vibes
 
-## Project info
+A comprehensive React TypeScript social planning application for nightlife and social activities.
 
-**URL**: https://lovable.dev/projects/ea0d3113-fd68-4505-bf4f-4ef61908ebc6
+## 🚀 Features
 
-## How can I edit this code?
+- **Social Planning**: Create and manage plans with friends
+- **Real-time Collaboration**: Live draft planning with real-time updates
+- **AI-Powered Assistant**: Nova AI for intelligent suggestions and assistance
+- **Map Integration**: Google Maps integration for venue discovery
+- **Friend Management**: Comprehensive friend system with proximity features
+- **Messaging**: Built-in chat and messaging system
+- **Mobile-First Design**: Responsive design optimized for mobile devices
+- **Supabase Backend**: Modern backend with real-time capabilities
 
-There are several ways of editing your application.
+## 🛠️ Tech Stack
 
-**Use Lovable**
+- **Frontend**: React 18, TypeScript, Vite
+- **Styling**: Tailwind CSS, shadcn/ui components
+- **Backend**: Supabase (PostgreSQL, Auth, Real-time)
+- **Maps**: Google Maps API
+- **AI**: OpenAI integration for Nova AI assistant
+- **State Management**: Zustand stores
+- **Testing**: Vitest
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/ea0d3113-fd68-4505-bf4f-4ef61908ebc6) and start prompting.
+## 📦 Installation
 
-Changes made via Lovable will be committed automatically to this repo.
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/kevinbrodzinski/comesocial.git
+   cd comesocial
+   ```
 
-**Use your preferred IDE**
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+3. **Set up environment variables**
+   Create a `.env.local` file with:
+   ```env
+   VITE_SUPABASE_URL=your_supabase_url
+   VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+   VITE_GOOGLE_MAPS_API_KEY=your_google_maps_api_key
+   VITE_OPENAI_API_KEY=your_openai_api_key
+   ```
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+4. **Start the development server**
+   ```bash
+   npm run dev
+   ```
 
-Follow these steps:
+## 🏗️ Project Structure
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+```
+src/
+├── components/          # React components
+│   ├── ai/             # AI-related components
+│   ├── chat/           # Chat and messaging
+│   ├── coplan/         # Collaborative planning
+│   ├── feed/           # Social feed
+│   ├── friends/        # Friend management
+│   ├── map/            # Map components
+│   ├── messages/       # Messaging system
+│   ├── plan/           # Planning features
+│   └── ui/             # Reusable UI components
+├── hooks/              # Custom React hooks
+├── services/           # API and service layer
+├── stores/             # Zustand state management
+├── types/              # TypeScript type definitions
+└── utils/              # Utility functions
 ```
 
-**Edit a file directly in GitHub**
+## 🔧 Development
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+- **Linting**: `npm run lint`
+- **Type checking**: `npm run type-check`
+- **Testing**: `npm run test`
+- **Build**: `npm run build`
 
-**Use GitHub Codespaces**
+## 🚀 Deployment
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+The project is configured for deployment on Vercel, Netlify, or any static hosting platform.
 
-## What technologies are used for this project?
+## 📝 License
 
-This project is built with:
+This project is licensed under the MIT License.
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## 🤝 Contributing
 
-## How can I deploy this project?
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
 
-Simply open [Lovable](https://lovable.dev/projects/ea0d3113-fd68-4505-bf4f-4ef61908ebc6) and click on Share -> Publish.
+## 📞 Support
 
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+For support and questions, please open an issue on GitHub.
