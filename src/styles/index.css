@@ -1,0 +1,30 @@
+
+:root {
+  --map-header-h: 56px;
+  --bottom-nav-height: 64px;
+  --chat-input-height: 80px;
+  --total-bottom-height: calc(var(--bottom-nav-height) + var(--chat-input-height));
+  --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-inset-top: env(safe-area-inset-top, 0px);
+}
+
+/* Add support for mobile viewport units */
+html {
+  height: 100%;
+  height: 100dvh;
+}
+
+body {
+  height: 100%;
+  height: 100dvh;
+}
+
+#root {
+  height: 100%;
+  height: 100dvh;
+}
+
+/* Sheet section styling for enhanced visual separation */
+.sheet-section {
+  @apply bg-card/80 border border-border rounded-2xl shadow-md px-4 py-5 mb-6;
+}

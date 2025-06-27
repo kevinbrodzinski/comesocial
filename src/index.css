@@ -1,0 +1,100 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Light Mode - Enhanced Subtle Elevation Theme */
+    --background: 240 9% 94%; /* #F0F2F5 - Light Cool Grey (Main App Background) */
+    --foreground: 220 23% 11%; /* #16161A - Charcoal */
+    --card: 0 0% 100%; /* #FFFFFF - Pure White (Cards) */
+    --card-foreground: 220 23% 11%; /* #16161A - Charcoal */
+    --popover: 0 0% 100%; /* #FFFFFF - Pure White */
+    --popover-foreground: 220 23% 11%; /* #16161A - Charcoal */
+    --primary: 263 70% 60%; /* #7F5AF0 - Vibrant Purple */
+    --primary-foreground: 0 0% 100%; /* White */
+    --secondary: 220 9% 98%; /* #F9F9F9 - Off-White (Content Area Background) */
+    --secondary-foreground: 220 23% 11%; /* #16161A - Charcoal */
+    --muted: 220 9% 98%; /* #F9F9F9 - Off-White */
+    --muted-foreground: 220 6% 42%; /* #6A737D - Slate Grey */
+    --accent: 220 9% 96%; /* #F5F5F5 - Very Light Grey */
+    --accent-foreground: 220 23% 11%; /* #16161A - Charcoal */
+    --destructive: 0 85% 60%; /* Red */
+    --destructive-foreground: 0 0% 100%; /* White */
+    --border: 220 7% 91%; /* #E5E7EB - Light Grey for card borders */
+    --input: 220 9% 96%; /* #F5F5F5 - Very Light Grey */
+    --ring: 263 70% 60%; /* #7F5AF0 - Vibrant Purple */
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    /* Dark Mode - Alternative Theme */
+    --background: 218 27% 8%; /* #16161A - Deep Charcoal */
+    --foreground: 220 9% 85%; /* #EAEAEA - Off-White */
+    --card: 220 23% 11%; /* #242629 - Slate Grey */
+    --card-foreground: 220 9% 85%; /* #EAEAEA - Off-White */
+    --popover: 220 23% 11%; /* #242629 - Slate Grey */
+    --popover-foreground: 220 9% 85%; /* #EAEAEA - Off-White */
+    --primary: 263 70% 60%; /* #7F5AF0 - Vibrant Purple */
+    --primary-foreground: 220 9% 95%; /* Light text */
+    --secondary: 220 20% 14%; /* Dark Secondary */
+    --secondary-foreground: 220 9% 75%; /* Light text */
+    --muted: 220 20% 14%; /* Dark Muted */
+    --muted-foreground: 220 6% 55%; /* Medium text */
+    --accent: 220 20% 16%; /* Dark Accent */
+    --accent-foreground: 220 9% 85%; /* Light text */
+    --destructive: 0 62.8% 50%; /* Red */
+    --destructive-foreground: 220 9% 95%; /* Light text */
+    --border: 220 20% 18%; /* Dark border */
+    --input: 220 20% 16%; /* Dark input */
+    --ring: 263 70% 60%; /* #7F5AF0 - Vibrant Purple */
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* Enhanced Light Mode Shadow Utilities for Subtle Elevation */
+  .light-card-shadow {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.08);
+  }
+  
+  .light-card-shadow-hover {
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.12);
+  }
+  
+  .light-card-shadow-xl {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.10), 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+  
+  /* Content Area Background Helper */
+  .content-area-bg {
+    background-color: hsl(var(--secondary));
+  }
+}

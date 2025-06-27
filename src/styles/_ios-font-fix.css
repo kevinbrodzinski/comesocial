@@ -1,0 +1,9 @@
+
+/* iOS Safari auto-zoom prevention for text inputs */
+@supports (-webkit-touch-callout: none) {
+  textarea,
+  input[type="text"],
+  input[type="search"] {
+    font-size: 16px !important;
+  }
+}
