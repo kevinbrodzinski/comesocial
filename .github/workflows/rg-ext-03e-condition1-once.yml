@@ -1,0 +1,56 @@
+name: RG-EXT-03E One-Shot Condition-1 Projection
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  condition1-project:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install exact selected runtime
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install numpy scipy matplotlib
+          python -m pip install 'git+https://github.com/osqp/osqp-python.git@dcc6384845e27b275fc41b2106dd2c379d5d5db4'
+          python -m pip install --no-deps 'git+https://github.com/CLOCTools/lqmpc.git@0895de48013fc9a676053a6a46fc0b0fd34f8987'
+          python -m pip freeze > RG_EXT_03E_PIP_FREEZE.txt
+      - name: Consume one-shot authorization and create projected scientific record
+        id: project
+        continue-on-error: true
+        run: python condition1_probe/lqmpc_condition1_projector.py
+      - name: Hash projected evidence
+        if: always()
+        run: |
+          sha256sum condition1_probe/lqmpc_condition1_projector.py > RG_EXT_03E_EXECUTION_SHA256.txt
+          sha256sum RG_EXT_03E_PIP_FREEZE.txt >> RG_EXT_03E_EXECUTION_SHA256.txt
+          if [ -f RG_EXT_03E_PROJECTED_MEASUREMENT.json ]; then sha256sum RG_EXT_03E_PROJECTED_MEASUREMENT.json >> RG_EXT_03E_EXECUTION_SHA256.txt; fi
+      - name: Upload projected evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rg-ext-03e-condition1-projected-measurement
+          path: |
+            RG_EXT_03E_PROJECTED_MEASUREMENT.json
+            RG_EXT_03E_PIP_FREEZE.txt
+            RG_EXT_03E_EXECUTION_SHA256.txt
+          if-no-files-found: warn
+      - name: Enforce projection completion after evidence preservation
+        if: always()
+        run: |
+          test -f RG_EXT_03E_PROJECTED_MEASUREMENT.json || exit 2
+          python - <<'PY'
+          import json
+          r=json.load(open('RG_EXT_03E_PROJECTED_MEASUREMENT.json'))
+          ok=(r.get('authorization_consumed') is True and r.get('condition1_projection_complete') is True and r.get('firewall_intact') is True)
+          raise SystemExit(0 if ok else 1)
+          PY
