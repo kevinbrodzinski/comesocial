@@ -1,0 +1,33 @@
+name: RG-EXT-04C Portfolio Native Reconciliation
+on:
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  reconcile:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install exact OSQP runtime
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          python -m pip install numpy scipy
+          python -m pip install 'git+https://github.com/osqp/osqp-python.git@dcc6384845e27b275fc41b2106dd2c379d5d5db4'
+      - name: Execute frozen reconciliation
+        run: |
+          set -euo pipefail
+          python rg_ext04c/reconcile_portfolio.py | tee rg_ext04c/reconcile.log
+      - name: Freeze reconciliation artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rg-ext-04c-portfolio-reconciliation
+          path: |
+            RG_EXT_04C_RECONCILIATION_RECEIPT.json
+            rg_ext04c/reconcile.log
+          if-no-files-found: error
