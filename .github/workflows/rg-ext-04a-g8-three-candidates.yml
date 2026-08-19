@@ -1,0 +1,60 @@
+name: RG-EXT-04A G8 Three Candidates
+on:
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  quad:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Install exact OSQP runtime
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install numpy scipy
+          python -m pip install 'git+https://github.com/osqp/osqp-python.git@dcc6384845e27b275fc41b2106dd2c379d5d5db4'
+      - name: Run frozen G8
+        run: python rg_ext04a/g8_probe.py quad
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rg-ext-04a-g8-quad
+          path: RG_EXT_04A_G8_CAND-E04-001.json
+  portfolio:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Install exact OSQP runtime
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install numpy scipy
+          python -m pip install 'git+https://github.com/osqp/osqp-python.git@dcc6384845e27b275fc41b2106dd2c379d5d5db4'
+      - name: Run frozen G8
+        run: python rg_ext04a/g8_probe.py portfolio
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rg-ext-04a-g8-portfolio
+          path: RG_EXT_04A_G8_CAND-E04-002.json
+  pandapower:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Install exact pandapower source
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install 'git+https://github.com/e2nIEE/pandapower.git@e0bcb3bee7954c7845c735834bdb42419fc95b8a'
+      - name: Run frozen G8
+        run: python rg_ext04a/g8_probe.py pandapower
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rg-ext-04a-g8-pandapower
+          path: RG_EXT_04A_G8_CAND-E04-003.json
