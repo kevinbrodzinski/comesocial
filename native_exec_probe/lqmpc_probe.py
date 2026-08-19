@@ -46,6 +46,7 @@ def run_point(umax_value):
         n, m = B.shape
         t_step = 0.001
         N = 25
+        M = 20
         Q = C.T @ C
         R = sparse.eye(m) * 1e-6
         umin = np.array([0.0])
@@ -57,7 +58,7 @@ def run_point(umax_value):
         n_sim = int(t_sim/t_step)
         xr_step = xr[:, :N*n_sim]
         mpc = lqmpc.LQMPC(t_step, A, B, C)
-        mpc.set_control(Q=Q, R=R, N=N, M=20)
+        mpc.set_control(Q=Q, R=R, N=N, M=M)
         mpc.set_constraints(umin=umin, umax=umax)
         result = mpc.step(t_sim, x0, u0, xr_step, out=False)
         solved = getattr(result.info, "status", None) == "solved"
@@ -67,9 +68,11 @@ def run_point(umax_value):
         r["outcome_present"] = outcome is not None
         r["outcome_type_valid"] = isinstance(outcome, (int, float, np.integer, np.floating))
         r["outcome_finite"] = bool(np.isfinite(outcome)) if r["outcome_type_valid"] else False
-        response = getattr(result, "y", None)
+        y = getattr(result, "y", None)
+        start = 2*N*n
+        response = y[start:start+M*m] if isinstance(y, np.ndarray) and y.ndim == 1 and y.size >= start + M*m else None
         r["response_present"] = response is not None
-        r["response_type_valid"] = isinstance(response, np.ndarray) and response.ndim == 1
+        r["response_type_valid"] = isinstance(response, np.ndarray) and response.ndim == 1 and response.size == M*m
         r["response_finite"] = bool(np.all(np.isfinite(response))) if r["response_type_valid"] else False
     except Exception as exc:
         r["native_execution_success"] = False
