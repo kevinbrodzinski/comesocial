@@ -5,7 +5,7 @@ from pandapower.networks import case9
 from pandapower.pypower.idx_gen import MU_PMAX
 
 CANDIDATE = "CAND-E03-001"
-INSTANCE_HASH = "36ff4c1e045a710859218afef4872a83309c0cf5fd3b215e13d290b282c1e76e"
+INSTANCE_HASH = "65902a8647a4d9afca34db1fa5dec522ce2c796053455a32bb8ed7aecf4f1bbb"
 POINTS = [180.0, 210.0, 240.0, 270.0, 300.0, 330.0, 360.0]
 
 def lock_hash():
