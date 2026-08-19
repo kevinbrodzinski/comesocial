@@ -1,0 +1,24 @@
+name: RG-EXT-04A Pandapower Source Metadata
+on:
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  source-metadata:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install frozen pandapower source
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install 'git+https://github.com/e2nIEE/pandapower.git@e0bcb3bee7954c7845c735834bdb42419fc95b8a'
+      - name: Run source-only metadata audit
+        run: python source_metadata/pandapower_case118_metadata.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rg-ext-04a-pandapower-source-metadata
+          path: PANDAPOWER_CASE118_SOURCE_METADATA.json
