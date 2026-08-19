@@ -4,7 +4,7 @@ from scipy import sparse
 import lqmpc
 
 CANDIDATE = "CAND-E03-002"
-INSTANCE_HASH = "a846d2c83c5bb7ff3852891604028361215210a88a1ed8c94c7bb26a6490a8d4"
+INSTANCE_HASH = "ecda92017d1f60e2d15901a36bcf65ffc05c648a938987ad14efeac8a469f66d"
 POINTS = [5.0, 7.5, 10.0, 12.5, 15.0]
 
 def lock_hash():
