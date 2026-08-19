@@ -1,0 +1,136 @@
+name: Native Executability G8
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pandapower:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install exact pandapower source
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install 'git+https://github.com/e2nIEE/pandapower.git@8292ab953d7c67afeba4c9b9178ca936c0c918ca'
+          python -m pip freeze > pandapower.pip.freeze.txt
+      - name: Run G8 projector
+        run: python native_exec_probe/pandapower_probe.py
+      - name: Hash execution inputs
+        if: always()
+        run: |
+          sha256sum native_exec_probe/pandapower_probe.py > pandapower.execution.sha256.txt
+          if [ -f pandapower_receipt.json ]; then sha256sum pandapower_receipt.json >> pandapower.execution.sha256.txt; fi
+          if [ -f pandapower.pip.freeze.txt ]; then sha256sum pandapower.pip.freeze.txt >> pandapower.execution.sha256.txt; fi
+      - name: Upload projected G8 artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: g8-pandapower
+          path: |
+            pandapower_receipt.json
+            pandapower.pip.freeze.txt
+            pandapower.execution.sha256.txt
+          if-no-files-found: warn
+      - name: Enforce declared G8 terminal state
+        if: always()
+        run: |
+          test -f pandapower_receipt.json || exit 2
+          python - <<'PY'
+          import json
+          r=json.load(open('pandapower_receipt.json'))
+          raise SystemExit(0 if r['terminal_state']=='G8_PASS_LOTTERY_ELIGIBLE' else 1)
+          PY
+
+  lqmpc:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install exact LQMPC and OSQP runtime sources
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install numpy scipy matplotlib
+          python -m pip install 'git+https://github.com/osqp/osqp-python.git@dcc6384845e27b275fc41b2106dd2c379d5d5db4'
+          python -m pip install --no-deps 'git+https://github.com/CLOCTools/lqmpc.git@0895de48013fc9a676053a6a46fc0b0fd34f8987'
+          python -m pip freeze > lqmpc.pip.freeze.txt
+      - name: Run G8 projector
+        run: python native_exec_probe/lqmpc_probe.py
+      - name: Hash execution inputs
+        if: always()
+        run: |
+          sha256sum native_exec_probe/lqmpc_probe.py > lqmpc.execution.sha256.txt
+          if [ -f lqmpc_receipt.json ]; then sha256sum lqmpc_receipt.json >> lqmpc.execution.sha256.txt; fi
+          if [ -f lqmpc.pip.freeze.txt ]; then sha256sum lqmpc.pip.freeze.txt >> lqmpc.execution.sha256.txt; fi
+      - name: Upload projected G8 artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: g8-lqmpc
+          path: |
+            lqmpc_receipt.json
+            lqmpc.pip.freeze.txt
+            lqmpc.execution.sha256.txt
+          if-no-files-found: warn
+      - name: Enforce declared G8 terminal state
+        if: always()
+        run: |
+          test -f lqmpc_receipt.json || exit 2
+          python - <<'PY'
+          import json
+          r=json.load(open('lqmpc_receipt.json'))
+          raise SystemExit(0 if r['terminal_state']=='G8_PASS_LOTTERY_ELIGIBLE' else 1)
+          PY
+
+  osqp-quadcopter:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install exact OSQP runtime source
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install numpy scipy
+          python -m pip install 'git+https://github.com/osqp/osqp-python.git@dcc6384845e27b275fc41b2106dd2c379d5d5db4'
+          python -m pip freeze > osqp.pip.freeze.txt
+      - name: Run G8 projector
+        run: python native_exec_probe/osqp_quadcopter_probe.py
+      - name: Hash execution inputs
+        if: always()
+        run: |
+          sha256sum native_exec_probe/osqp_quadcopter_probe.py > osqp.execution.sha256.txt
+          if [ -f osqp_receipt.json ]; then sha256sum osqp_receipt.json >> osqp.execution.sha256.txt; fi
+          if [ -f osqp.pip.freeze.txt ]; then sha256sum osqp.pip.freeze.txt >> osqp.execution.sha256.txt; fi
+      - name: Upload projected G8 artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: g8-osqp-quadcopter
+          path: |
+            osqp_receipt.json
+            osqp.pip.freeze.txt
+            osqp.execution.sha256.txt
+          if-no-files-found: warn
+      - name: Enforce declared G8 terminal state
+        if: always()
+        run: |
+          test -f osqp_receipt.json || exit 2
+          python - <<'PY'
+          import json
+          r=json.load(open('osqp_receipt.json'))
+          raise SystemExit(0 if r['terminal_state']=='G8_PASS_LOTTERY_ELIGIBLE' else 1)
+          PY
