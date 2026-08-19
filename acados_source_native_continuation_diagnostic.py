@@ -37,8 +37,6 @@ def main():
     assert identity=={'acados':ACADOS_COMMIT,'blasfeo':BLASFEO_SHA,'hpipm':HPIPM_SHA,'tera_renderer':TERA_SHA}
     mod=load_example(root)
     solver=mod.setup_solver(N=N,dt=DT,u_max=UMAX)
-    # Mirror the upstream example's explicit pre-solve state-trajectory initialization,
-    # prospectively fixed before this diagnostic: angle ramp 0 -> 0.2*pi over N+1 nodes.
     seed=np.zeros(4)
     for n,tau in enumerate(np.linspace(0.0,1.0,N+1)):
         seed[1]=tau*OFFICIAL_SEED_TERMINAL_ANGLE
@@ -50,7 +48,8 @@ def main():
     for j,theta in enumerate(schedule):
         x0=np.array([0.0,float(theta),0.0,0.0])
         try:
-            status=int(solver.solve_for_x0(x0))
+            solver.solve_for_x0(x0)
+            status=int(solver.status)
             observations.append({'index':j,'theta_rad':float(theta),'theta_over_pi':float(theta/math.pi),'status':status,'J_star':float(solver.get_cost())})
         except Exception as e:
             terminal_status='CONTINUATION_FAILED_BEFORE_PI'
@@ -58,6 +57,8 @@ def main():
             break
     result={
       'diagnostic':'SOURCE_NATIVE_CONTINUATION_TO_PI',
+      'instrument_version':'v0.1.1_return_semantics_fix',
+      'instrumentation_change_from_invalid_v0.1':'solve_for_x0 return is no longer cast to int; solver.status is read after the upstream-style call',
       'source_identity':identity,
       'u_max_N':UMAX,
       'solver_reused_across_schedule':True,
