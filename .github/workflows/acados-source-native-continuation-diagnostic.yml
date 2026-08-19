@@ -1,0 +1,72 @@
+name: acados source-native continuation diagnostic
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  continuation-diagnostic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install exact dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip setuptools wheel
+          python -m pip install 'numpy==2.5.1' 'scipy==1.18.0' 'casadi==3.7.2' 'matplotlib==3.11.1' 'cython==3.2.9' 'Deprecated==1.3.1'
+      - name: Clone exact source and submodules
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone https://github.com/acados/acados.git "$RUNNER_TEMP/acados"
+          git -C "$RUNNER_TEMP/acados" checkout --detach 21376cb1af6b7dd45f675367272d3ba8100b26c0
+          git -C "$RUNNER_TEMP/acados" submodule update --init --recursive
+          test "$(git -C "$RUNNER_TEMP/acados" rev-parse HEAD)" = '21376cb1af6b7dd45f675367272d3ba8100b26c0'
+          test "$(git -C "$RUNNER_TEMP/acados/external/blasfeo" rev-parse HEAD)" = 'd6251233923c9b475fe894fb729fb63ab693e301'
+          test "$(git -C "$RUNNER_TEMP/acados/external/hpipm" rev-parse HEAD)" = 'e3a56c1caddd7f12d125d84f337b9a9e5c186271'
+          test "$(git -C "$RUNNER_TEMP/acados/interfaces/acados_template/tera_renderer" rev-parse HEAD)" = 'a480a64b0a2cc15d4b1e6146e986388709ac0716'
+      - name: Compile exact acados source
+        shell: bash
+        run: |
+          set -euo pipefail
+          cmake -S "$RUNNER_TEMP/acados" -B "$RUNNER_TEMP/acados/build" \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DACADOS_INSTALL_DIR="$RUNNER_TEMP/acados" \
+            -DBUILD_SHARED_LIBS=ON \
+            -DBLASFEO_TARGET=GENERIC \
+            -DHPIPM_TARGET=GENERIC \
+            -DACADOS_WITH_OPENMP=OFF \
+            -DACADOS_SILENT=OFF
+          cmake --build "$RUNNER_TEMP/acados/build" --parallel 2
+          cmake --install "$RUNNER_TEMP/acados/build"
+      - name: Run fixed source-native continuation diagnostic
+        shell: bash
+        env:
+          ACADOS_SOURCE_DIR: ${{ runner.temp }}/acados
+          PYTHONPATH: ${{ runner.temp }}/acados/interfaces/acados_template
+          LD_LIBRARY_PATH: ${{ runner.temp }}/acados/lib
+          MPLBACKEND: Agg
+          DIAG_OUT: continuation_diag_out
+        run: |
+          set -euo pipefail
+          mkdir -p continuation_diag_out
+          python acados_source_native_continuation_diagnostic.py | tee continuation_diag_out/STDOUT.json
+          find "$RUNNER_TEMP/acados/lib" -maxdepth 1 -type f -print0 | sort -z | xargs -0 sha256sum > continuation_diag_out/ACADOS_LIBRARY_SHA256.txt
+          git -C "$RUNNER_TEMP/acados" submodule status --recursive > continuation_diag_out/ACADOS_SUBMODULE_LOCK.txt
+          sha256sum continuation_diag_out/* | sort > continuation_diag_out/MANIFEST_SHA256.txt
+      - name: Upload continuation diagnostic artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: acados-source-native-continuation-diagnostic
+          path: continuation_diag_out/
+          if-no-files-found: error
+          retention-days: 30
