@@ -14,8 +14,12 @@ jobs:
         with:
           python-version: '3.12'
       - name: Execute frozen selector exactly once
-        run: python rg_ext04b/select_once.py | tee rg_ext04b/selection.log
+        shell: bash
+        run: |
+          set -euo pipefail
+          python rg_ext04b/select_once.py | tee rg_ext04b/selection.log
       - name: Freeze execution artifact
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: rg-ext-04b-selection
