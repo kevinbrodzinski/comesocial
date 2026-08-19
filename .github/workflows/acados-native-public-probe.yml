@@ -15,12 +15,14 @@ jobs:
       - name: Checkout public probe
         uses: actions/checkout@v4
 
-      - name: Install build prerequisites
+      - name: Verify preinstalled build prerequisites
         shell: bash
         run: |
           set -euo pipefail
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends build-essential cmake git ca-certificates pkg-config python3-dev
+          git --version
+          cmake --version | head -1
+          gcc --version | head -1
+          g++ --version | head -1
 
       - name: Set Python 3.12
         uses: actions/setup-python@v5
