@@ -1,0 +1,25 @@
+name: RG-EXT-02 public runner diagnostic
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  diagnostic:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Prove runner execution
+        shell: bash
+        run: |
+          set -euo pipefail
+          uname -a
+          uname -m
+          python3 --version
+          cmake --version | head -1 || true
+          gcc --version | head -1 || true
+          echo RG_EXT_02_PUBLIC_RUNNER_DIAGNOSTIC_PASS
