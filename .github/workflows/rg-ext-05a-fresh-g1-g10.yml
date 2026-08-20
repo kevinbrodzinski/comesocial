@@ -1,62 +1,37 @@
-name: RG-EXT-05A fresh G1-G10 campaign
-
+name: RG-EXT-05A Fresh G1-G10 Campaign
 on:
-  push:
-    branches: [rg-ext-05a-fresh-g1-g10-20260819]
   pull_request:
-    types: [opened, synchronize]
-
+    branches: [main]
 permissions:
   contents: read
-
 jobs:
   execute-once:
-    if: github.ref == 'refs/heads/rg-ext-05a-fresh-g1-g10-20260819' || github.head_ref == 'rg-ext-05a-fresh-g1-g10-20260819'
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
-      - name: Checkout exact event ref
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
-
-      - name: Set up frozen Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-          check-latest: false
-
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
       - name: Install frozen native runtimes
-        shell: bash
         run: |
           set -euo pipefail
-          python -m pip install --disable-pip-version-check --no-input \
-            numpy==2.5.1 scipy==1.18.0 clarabel==0.11.1 scs==3.2.11 highspy==1.15.1
+          python -m pip install --disable-pip-version-check --no-input numpy==2.5.1 scipy==1.18.0 clarabel==0.11.1 scs==3.2.11 highspy==1.15.1
           python -m pip freeze | tee rg_ext05a/PIP_FREEZE.txt
-
       - name: Freeze carrier input hashes before execution
-        shell: bash
         run: |
           set -euo pipefail
-          sha256sum rg_ext05a/frozen_config.json rg_ext05a/run_campaign.py rg_ext05a/PIP_FREEZE.txt \
-            | tee rg_ext05a/PRE_EXECUTION_SHA256.txt
-
+          sha256sum rg_ext05a/frozen_config.json rg_ext05a/run_campaign.py rg_ext05a/PIP_FREEZE.txt | tee rg_ext05a/PRE_EXECUTION_SHA256.txt
       - name: Execute prospective G1 through G10 exactly once
-        shell: bash
         run: |
           set -euo pipefail
           python rg_ext05a/run_campaign.py | tee rg_ext05a/TERMINAL_STDOUT.jsonl
-
       - name: Seal post-execution artifact hashes
-        shell: bash
         run: |
           set -euo pipefail
-          find rg_ext05a/out -maxdepth 1 -type f -print0 | sort -z | xargs -0 sha256sum \
-            | tee rg_ext05a/POST_EXECUTION_SHA256.txt
+          find rg_ext05a/out -maxdepth 1 -type f -print0 | sort -z | xargs -0 sha256sum | tee rg_ext05a/POST_EXECUTION_SHA256.txt
           cat rg_ext05a/out/RG_EXT_05A_TERMINAL_SUMMARY.json
-
-      - name: Upload immutable RG-EXT-05A evidence
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: rg-ext-05a-g1-g10-terminal-freeze
           path: |
@@ -68,4 +43,3 @@ jobs:
             rg_ext05a/POST_EXECUTION_SHA256.txt
             rg_ext05a/out/
           if-no-files-found: error
-          retention-days: 90
