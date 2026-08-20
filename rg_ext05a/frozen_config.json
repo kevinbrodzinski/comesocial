@@ -1,0 +1,113 @@
+{
+  "suite_id": "RG-EXT-05A",
+  "protocol_version": "1.0",
+  "parent_gate": "RG-EXT-05-G10-v1.0",
+  "freshness_rule": "No RG-EXT-04 candidate identity, measurement-contract hash, source/workload instance, or G10 reconciliation profile is grandfathered into RG-EXT-05A.",
+  "runtime": {
+    "os": "ubuntu-24.04",
+    "python": "3.12",
+    "numpy": "2.5.1",
+    "scipy": "1.18.0",
+    "clarabel": "0.11.1",
+    "scs": "3.2.11",
+    "highspy": "1.15.1"
+  },
+  "gates": {
+    "G1": "native_optimized_value",
+    "G2": "theorem_compatible_resource_parameter",
+    "G3": "regular_tangent_branch",
+    "G4": "possible_nonzero_contact",
+    "G5": "source_level_response_value_relation",
+    "G6": "sufficient_continuous_resolution",
+    "G7": "predictor_independence_and_firewall",
+    "G8": "native_executability",
+    "G9": "prospective_measurement_support",
+    "G10": "native_measurement_semantics_reconciliation"
+  },
+  "g9": {
+    "alpha_min_distinct_positive_radii": 5,
+    "beta_min_in_window": 1024,
+    "beta_r_min": 0.00001,
+    "beta_r_max": 0.30,
+    "nested_fractions": [0.5, 0.75, 1.0],
+    "beta_min_distinct_in_window": 3,
+    "beta_min_each_nested_window": 3
+  },
+  "g10": {
+    "micro_stencil": "central_symmetric",
+    "micro_h": 0.001,
+    "objective_allowance": {"absolute_floor": 2e-7, "relative_factor": 2e-7},
+    "response_fd_allowance": {"absolute_floor": 0.0002, "relative_factor": 0.00005},
+    "determinism_allowance": {"absolute_floor": 1e-9, "relative_factor": 1e-8},
+    "native_passes": 2,
+    "execution_order": "pass_A_then_pass_B; within each pass bank ascending; each center executes p-h,p,p+h with fresh cold-start solver objects",
+    "sacrificial_projection": {
+      "raw_condition1_eligible": false,
+      "raw_alpha_beta_theta_eligible": false,
+      "selector_allowed_fields": [
+        "candidate_id",
+        "candidate_identity_sha256",
+        "workload_sha256",
+        "measurement_contract_sha256",
+        "g10_profile_sha256",
+        "g1_g10_gate_booleans",
+        "terminal_state",
+        "raw_evidence_sha256",
+        "environment_sha256"
+      ],
+      "selector_prohibited_values": [
+        "objective_values",
+        "dual_values",
+        "finite_difference_values",
+        "alpha",
+        "beta",
+        "theta",
+        "predicted_class",
+        "p_contact",
+        "mass_response",
+        "boundary_outcomes"
+      ]
+    }
+  },
+  "selector": {
+    "id": "RG-EXT-05-NIST-SHA256-U64-MOD-N-v1",
+    "preimage": "RG-EXT-05-SELECTION|<universe_sha256>|<UPPERCASE_NIST_OUTPUT_VALUE>",
+    "digest": "SHA-256",
+    "integer": "first 8 digest bytes, unsigned big-endian",
+    "index_rule": "u64 mod N",
+    "randomness_provider": "NIST Randomness Beacon chain 2",
+    "randomness_status": "PROHIBITED_UNTIL_POST_FREEZE"
+  },
+  "candidates": [
+    {
+      "candidate_id": "CAND-E05-001",
+      "system": "Clarabel direct convex QP",
+      "source_identity": {"upstream": "oxfordcontrol/Clarabel.rs", "release": "v0.11.1", "python_package": "clarabel==0.11.1"},
+      "workload": {"family": "deterministic_diagonal_rank1_qp", "n": 40, "p_release": 1.55, "diagonal_start": 0.90, "diagonal_stop": 1.60, "rank1_strength": 0.015, "weight_start": 0.82, "weight_stop": 1.18},
+      "resource_bank": [0.30,0.40,0.50,0.60,0.70,0.80,0.90,1.00,1.10],
+      "alpha_measurement_map": {"resource_radius": "rho=(p_release-p)/p_release", "response": "U=-dJ_star/dp from native resource-row dual aggregation", "later_fit": "log(U)=const+alpha*log(rho)", "scientific_epoch": "fresh calls only after lottery selection and Condition-1 authorization"},
+      "beta_source_only_geometry": {"atlas": "all balanced three-coordinate relief directions dx=(+1,-1/2,-1/2) over all triples and positive-coordinate choices", "native_source_quantity": "q_beta=0.5*dx^T*P*dx", "normalization": "g=(q_beta-q_min)/(q_max-q_min)", "no_native_solve": true},
+      "g10_native_reconciliation_profile": {"resource_row_mapping": "Clarabel conic rows 0..n-1 are x_i<=p*w_i; rows n..2n-1 are -x_i<=0", "objective_extractor": "DefaultSolution.obj_val", "direct_objective": "0.5*x^T*P*x+q^T*x", "response_extractor": "DefaultSolution.z[0:n]", "response_sign_aggregation": "g_dual=-dot(z_upper,w)", "finite_difference": "central native-objective stencil [J(p+h)-J(p-h)]/(2h)", "solver_policy": "fresh DefaultSolver each call; verbose=false; full-accuracy tolerances 1e-10; presolve disabled if supported"}
+    },
+    {
+      "candidate_id": "CAND-E05-002",
+      "system": "SCS direct convex QP",
+      "source_identity": {"upstream": "cvxgrp/scs", "release": "3.2.11", "python_package": "scs==3.2.11"},
+      "workload": {"family": "deterministic_diagonal_chain_qp", "n": 44, "p_release": 1.65, "diagonal_start": 1.00, "diagonal_stop": 1.55, "chain_strength": 0.04, "weight_start": 0.82, "weight_stop": 1.18},
+      "resource_bank": [0.30,0.40,0.50,0.60,0.70,0.80,0.90,1.00,1.10],
+      "alpha_measurement_map": {"resource_radius": "rho=(p_release-p)/p_release", "response": "U=-dJ_star/dp from native resource-row dual aggregation", "later_fit": "log(U)=const+alpha*log(rho)", "scientific_epoch": "fresh calls only after lottery selection and Condition-1 authorization"},
+      "beta_source_only_geometry": {"atlas": "all balanced three-coordinate relief directions dx=(+1,-1/2,-1/2) over all triples and positive-coordinate choices", "native_source_quantity": "q_beta=0.5*dx^T*P*dx", "normalization": "g=(q_beta-q_min)/(q_max-q_min)", "no_native_solve": true},
+      "g10_native_reconciliation_profile": {"resource_row_mapping": "SCS conic rows 0..n-1 are x_i<=p*w_i; rows n..2n-1 are -x_i<=0", "objective_extractor": "solution['info']['pobj']", "direct_objective": "0.5*x^T*P*x+q^T*x", "response_extractor": "solution['y'][0:n]", "response_sign_aggregation": "g_dual=-dot(y_upper,w)", "finite_difference": "central native-objective stencil [J(p+h)-J(p-h)]/(2h)", "solver_policy": "fresh SCS object each call; eps_abs=eps_rel=1e-9; max_iters=100000; adaptive_scale=false; acceleration_lookback=0"}
+    },
+    {
+      "candidate_id": "CAND-E05-003",
+      "system": "HiGHS direct convex QP",
+      "source_identity": {"upstream": "ERGO-Code/HiGHS", "release": "v1.15.1", "python_package": "highspy==1.15.1"},
+      "workload": {"family": "deterministic_block_coupled_qp", "n": 48, "block_size": 8, "p_release": 1.75, "diagonal_start": 0.80, "diagonal_stop": 1.70, "block_rank1_strength": 0.01, "weight_start": 0.82, "weight_stop": 1.18},
+      "resource_bank": [0.30,0.40,0.50,0.60,0.70,0.80,0.90,1.00,1.10],
+      "alpha_measurement_map": {"resource_radius": "rho=(p_release-p)/p_release", "response": "U=-dJ_star/dp from native resource-row dual aggregation", "later_fit": "log(U)=const+alpha*log(rho)", "scientific_epoch": "fresh calls only after lottery selection and Condition-1 authorization"},
+      "beta_source_only_geometry": {"atlas": "all balanced three-coordinate relief directions dx=(+1,-1/2,-1/2) over all triples and positive-coordinate choices", "native_source_quantity": "q_beta=0.5*dx^T*P*dx", "normalization": "g=(q_beta-q_min)/(q_max-q_min)", "no_native_solve": true},
+      "g10_native_reconciliation_profile": {"resource_row_mapping": "HiGHS rows 0..n-1 are identity resource rows with row_upper=p*w and row_lower=-infinity; column lower=0", "objective_extractor": "HighsInfo.objective_function_value", "direct_objective": "0.5*x^T*P*x+q^T*x", "response_extractor": "HighsSolution.row_dual[0:n]", "response_sign_aggregation": "g_dual=dot(row_dual_upper,w)", "finite_difference": "central native-objective stencil [J(p+h)-J(p-h)]/(2h)", "solver_policy": "fresh Highs model each call; output_flag=false; presolve=off; fixed feasibility/optimality tolerances where accepted"}
+    }
+  ]
+}
