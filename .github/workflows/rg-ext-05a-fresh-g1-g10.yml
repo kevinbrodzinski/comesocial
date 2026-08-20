@@ -2,7 +2,7 @@ name: RG-EXT-05A fresh G1-G10 campaign
 
 on:
   pull_request:
-    types: [opened]
+    types: [opened, synchronize]
 
 permissions:
   contents: read
