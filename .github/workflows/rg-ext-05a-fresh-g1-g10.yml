@@ -1,6 +1,8 @@
 name: RG-EXT-05A fresh G1-G10 campaign
 
 on:
+  push:
+    branches: [rg-ext-05a-fresh-g1-g10-20260819]
   pull_request:
     types: [opened, synchronize]
 
@@ -9,11 +11,11 @@ permissions:
 
 jobs:
   execute-once:
-    if: github.head_ref == 'rg-ext-05a-fresh-g1-g10-20260819'
+    if: github.ref == 'refs/heads/rg-ext-05a-fresh-g1-g10-20260819' || github.head_ref == 'rg-ext-05a-fresh-g1-g10-20260819'
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
-      - name: Checkout exact PR merge ref
+      - name: Checkout exact event ref
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
